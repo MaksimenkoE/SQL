@@ -1,0 +1,25 @@
+# Напишите запрос, который выведет пилотов, которые в качестве второго пилота в августе этого года ездили в аэропорт Шереметьево.
+SELECT name
+FROM pilots INNER JOIN flights ON pilots.pilot_id = flights.second_pilot_id
+INNER JOIN planes ON flights.plane_id = planes.plane_id
+WHERE destination = "Шереметьево" AND flight_dt LIKE "2022-08-%"
+GROUP BY pilot_id;
+
+# Выведите пилотов старше 45 лет, которые совершили больше 30 полетов на грузовых самолетах.
+SELECT name
+FROM pilots
+INNER JOIN flights ON pilots.pilot_id = flights.first_pilot_id OR pilots.pilot_id = flights.second_pilot_id
+INNER JOIN planes ON flights.plane_id = planes.plane_id
+WHERE age > 45 AND cargo_flg = 1
+GROUP BY pilot_id
+HAVING COUNT(cargo_flg) > 30;
+
+# Выведите ТОП 10 пилотов-капитанов (first_pilot_id), которые перевезли наибольшее число пассажиров в этом году.
+SELECT name
+FROM pilots
+INNER JOIN flights ON pilots.pilot_id = flights.first_pilot_id
+INNER JOIN planes ON flights.plane_id = planes.plane_id
+WHERE cargo_flg = 0 AND flight_dt LIKE "2022-%"
+GROUP BY pilot_id
+ORDER BY SUM(capacity) DESC
+LIMIT 10;
